@@ -1,12 +1,12 @@
-from util.Material import Material
-from util.Cutout import Cutout
-from util.methods.MatFromImage import GenerateMaterial
-from util.CustomMath import getAngle, getLength
+from Placement.util.Material import Material
+from Placement.util.Cutout import Cutout
+from Placement.util.methods.MatFromImage import GenerateMaterial
+from Placement.util.CustomMath import getAngle, getLength
 import cv2 as cv
 import numpy as np
 import math
 
-material = GenerateMaterial('Real-01.jpg')
+material = GenerateMaterial('Placement/TestDouble.jpg')
 # print(material.findSections(20))
 
 

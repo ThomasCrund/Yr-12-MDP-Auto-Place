@@ -1,5 +1,5 @@
 import math
-from util.CustomMath import getAngle, getLength
+from Placement.util.CustomMath import getAngle, getLength
 import cv2 as cv
 
 
@@ -58,9 +58,9 @@ def createSection(section, pointA, pointB, offsetDistance, cutouts, currentCutou
     offsetStartX = aX + offsetDistance * math.cos(angle + (math.pi / 2))
     offsetStartY = aY + offsetDistance * math.sin(angle + (math.pi / 2))
     checkDistance = cv.pointPolygonTest(cutouts[currentCutoutIndex].points, (offsetStartX + along * math.cos(angle), offsetStartY + along * math.sin(angle)), False)
-    print(checkDistance, offsetStartX, offsetStartY, currentCutoutIndex)
+    # print(checkDistance, offsetStartX, offsetStartY, currentCutoutIndex)
     if checkDistance > 0:
-        print("changedSides")
+        # print("changedSides")
         offsetStartX = aX + offsetDistance * math.cos(angle - (math.pi / 2))
         offsetStartY = aY + offsetDistance * math.sin(angle - (math.pi / 2))
 

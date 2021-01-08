@@ -1,9 +1,9 @@
-from util.Cutout import Cutout
-from util.Section import Section, createSection
+from Placement.util.Cutout import Cutout
+from Placement.util.Section import Section, createSection
+from Placement.util.CustomMath import getAngle, getLength
 import cv2 as cv
 import numpy as np
 import random as rng
-from util.CustomMath import getAngle, getLength
 import math
 
 class Material:
@@ -26,7 +26,7 @@ class Material:
             cv.line(img, spaceMin, spaceMax, (0, 255, 0))
             cv.line(img, adjMin, adjMax, (0, 0, 255))
 
-        cv.imwrite('OutputImage.jpg', img)
+        # cv.imwrite('OutputImage.jpg', img)
         cv.imshow('Material Print', img)
         cv.waitKey(0)
         cv.destroyAllWindows()
@@ -35,10 +35,7 @@ class Material:
         return self.cutouts
 
     def findSections(self, offsetDistance, accuracy = 5, secondAccuracy = 1):
-        for cutout in self.cutouts:
-            x,y,w,h = cv.boundingRect(cutout.getPoints())
-            print(x, y, w, h)
-        img = np.ones((self.height, self.width, 3), np.uint8)*255
+        # img = np.ones((self.height, self.width, 3), np.uint8)*255
         # cv.line(img, (239, 165), (int( 239 + 50 * math.cos(-2.35619)), int( 165 + 50 * math.sin(-2.35619))), (255, 0, 255))
         materialSections = []
         previousSection = None
@@ -79,19 +76,19 @@ class Material:
                         openSections.append([lengthAlong, lengthAlong])
                     else:
                         openSections[-1][1] = lengthAlong
-                    cv.circle(img, (pointX, pointY), 1, (0, 255, 0))
+                    # cv.circle(img, (pointX, pointY), 1, (0, 255, 0))
                     # img[pointY][pointX] = [0, 255, 0]
 
                 else:
                     open = False
                     # print("Distance", smallest, smallestId)
             # nonlocal previousSection
-            print(pointA, pointB, openSections, currentCutoutIndex)
+            # print(pointA, pointB, openSections, currentCutoutIndex)
             # if len(openSections) == 0:
-            cv.putText(img, str(pointA[0]) + "," + str(pointA[1]), (pointA[0], pointA[1]), cv.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0))
-            cv.circle(img, (pointA[0], pointA[1]), 1, (0, 255, 0))
-            cv.putText(img, str(pointB[0]) + "," + str(pointB[1]), (pointB[0], pointB[1]), cv.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0))
-            cv.circle(img, (pointB[0], pointB[1]), 1, (0, 255, 0))
+            # cv.putText(img, str(pointA[0]) + "," + str(pointA[1]), (pointA[0], pointA[1]), cv.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0))
+            # cv.circle(img, (pointA[0], pointA[1]), 1, (0, 255, 0))
+            # cv.putText(img, str(pointB[0]) + "," + str(pointB[1]), (pointB[0], pointB[1]), cv.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0))
+            # cv.circle(img, (pointB[0], pointB[1]), 1, (0, 255, 0))
             for currentSectionId in range(len(openSections)):
                 section = openSections[currentSectionId]
             
@@ -112,9 +109,9 @@ class Material:
         # cv.circle(img, (239, 165), 1, (255, 0, 0))
         # cv.circle(img, (252, 150), 1, (255, 0, 0))
         
-        cv.imwrite('OutputImagePoints.jpg', img, )
-        cv.imshow('Find Sections', img)
-        cv.waitKey(0)
-        cv.destroyAllWindows()  
+        # cv.imwrite('OutputImagePoints.jpg', img, )
+        # cv.imshow('Find Sections', img)
+        # cv.waitKey(0)
+        # cv.destroyAllWindows()  
 
         return materialSections
