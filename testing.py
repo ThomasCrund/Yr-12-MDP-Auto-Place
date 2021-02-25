@@ -2,7 +2,8 @@ from Placement.util.Material import Material
 from Placement.util.Cutout import Cutout
 from Placement.util.methods.MatFromImage import GenerateMaterial
 from Placement.util.methods.dxfImport import partFromDxf
-from Placement.util.CustomMath import getAngle, getLength
+from Placement.util.methods.place import placePerimeter
+from Placement.util.CustomMath import getAngle, getLength, rotateAroundPoint
 import cv2 as cv
 import numpy as np
 import math
@@ -10,10 +11,24 @@ import math
 # print("Test")
 # partFromDxf("TestFiles/TestDXF.dxf")
 # partFromDxf("TestFiles/TestDXFCutout.dxf")
-partFromDxf("TestFiles/TestDXFCutoutRound.dxf")
 
-# material = GenerateMaterial('Placement/Real-01.jpg')
-# print(material.findSections(20))
+# Generate Material
+# material = GenerateMaterial('Placement/TestDouble.jpg')
+material = GenerateMaterial('Placement/TestAngle.jpg')
+
+# Import DXF into part
+part = partFromDxf("TestFiles/TestDXFCutoutRound.dxf")
+
+part.print()
+part.rotate((0, 0), math.pi/4).print()
+
+# Calculate the best position for the part
+placePerimeter(material, part);
+
+
+
+# print(material.cutouts[0].points)
+# print(cv.contourArea(material.cutouts[0].points))
 # material.print()
 
 

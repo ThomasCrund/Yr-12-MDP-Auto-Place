@@ -7,16 +7,19 @@ class Section:
 
     adjMin = None
     adjMax = None
+    SpaceMin = None
+    SpaceMax = None
     adjMaxPt = (0, 0)
     adjMinPt = (0, 0)
     SpaceMaxPt = (0, 0)
     SpaceMinPt = (0, 0)
 
-    def __init__(self, offsetX, offsetY, angle, originalSide):
+    def __init__(self, offsetX, offsetY, angle, originalSide, placeSide = 1):
         self.offsetX = offsetX
         self.offsetY = offsetY
         self.angle = angle
         self.originalSide = originalSide
+        self.placeSide = placeSide
         pass
 
     def setAdjacent(self, direction, num):
@@ -41,6 +44,8 @@ class Section:
     def exists(self):
         return not (self.adjMin == None or self.adjMax == None)
 
+    
+
 
 
 
@@ -54,6 +59,7 @@ def createSection(section, pointA, pointB, offsetDistance, cutouts, currentCutou
     width, height = screen
 
     along = int((section[0] + section[1])/ 2)
+    placeSide = 1
 
     offsetStartX = aX + offsetDistance * math.cos(angle + (math.pi / 2))
     offsetStartY = aY + offsetDistance * math.sin(angle + (math.pi / 2))
@@ -63,9 +69,10 @@ def createSection(section, pointA, pointB, offsetDistance, cutouts, currentCutou
         # print("changedSides")
         offsetStartX = aX + offsetDistance * math.cos(angle - (math.pi / 2))
         offsetStartY = aY + offsetDistance * math.sin(angle - (math.pi / 2))
+        placeSide = -1
+    
 
-
-    sectionData = Section(offsetStartX, offsetStartY, angle, (pointA, pointB))
+    sectionData = Section(offsetStartX, offsetStartY, angle, (pointA, pointB), placeSide)
 
     direction = 1
     while direction >= 0:

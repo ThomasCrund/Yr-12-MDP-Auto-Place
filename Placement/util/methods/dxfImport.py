@@ -4,7 +4,7 @@ from ezdxf.entities.spline import Spline
 
 class DxfObject:
 
-    def __init__(self, startPoint, endPoint, objectData, inverted = False):
+    def __init__(self, startPoint, endPoint, objectData, inverted = False) -> Part:
         self.startPoint = startPoint
         self.endPoint = endPoint
         self.objectData = objectData
@@ -16,7 +16,7 @@ class DxfObject:
         self.startPoint = self.endPoint
         self.endPoint = temp
 
-def partFromDxf(filePath):
+def partFromDxf(filePath) -> Part:
 
     # Load File
     try:
@@ -59,24 +59,21 @@ def partFromDxf(filePath):
 
 
     def detectElement(e):
-        # print(e, msp[1])
-
+        # print(e)
 
         if e.dxftype() == 'LWPOLYLINE':
+
             for element in e.virtual_entities():
-                # print(element)
                 detectElement(element)
-            pass
+
         elif e.dxftype() == 'LINE':
-            # print(e.dxf.start, e.dxf.end, e.dxf.layer)
             addLoop(e.dxf.start, e.dxf.end, e)
+
         elif e.dxftype() == 'SPLINE':
-            # print(e.control_points[0], e.control_points[-1])
             addLoop(e.control_points[0], e.control_points[-1], e)
-            # for point in e.control_points:
-            #     print(point)
+
         elif e.dxftype() == 'ARC':
-            detectElement(Spline.from_arc(e))
+            addLoop(e.start_point, e.end_point, e)
 
         else:
             print(f"AP: DXF Insert Error. DXF element type {e.dxftype()} not supported")
@@ -95,13 +92,9 @@ def partFromDxf(filePath):
         if response == "Error":
             return None
         if response == None:
-            pass
-
-
-        
+            pass      
 
     #join loops
-
     changed = True
     while changed == True:
         changed = False
@@ -112,10 +105,6 @@ def partFromDxf(filePath):
                 if i == currentChain:
                     continue
 
-                # 
-                # I have left what could be a possible error if the entire chain is the wrong way around
-                # I don't know if this can occur so I have code to print if it is detected as happening (I can't test/ fix if i don't know how to create)
-                # 
                 if loops[i][-1].endPoint == loops[currentChain][0].startPoint:
                     loops[i].extend(loops[currentChain])
                     loops.pop(currentChain)
@@ -133,18 +122,58 @@ def partFromDxf(filePath):
 
             currentChain -= 1
 
-    # invertedCatch = False
-    # print(len(loops))
+    parts = []
+    greatestIndex = None
+    greatestArea = 0
     for i in range(len(loops)):
         loop = loops[i]
-        print(f"loop {i}")
-        for element in loop:
-            # if element.inverted == True:
-            #     invertedCatch = True
-            print(element.startPoint, element.endPoint, element.objectData.dxftype(), element.inverted)
+        
+        if loop[0].startPoint != loop[-1].endPoint: continue
 
+        parts.append(Part()) # Setup part object for points to be put into
+
+        for elementId in range(len(loop)):
+            element = loop[elementId]
+            e = element.objectData
+
+            # print(element.startPoint, element.endPoint, element.objectData.dxftype(), element.inverted)
+
+            if e.dxftype() == 'LINE':
+
+                if not element.inverted:
+                    parts[i].addPoint(e.dxf.start)
+                    parts[i].addPoint(e.dxf.end)
+                else:
+                    parts[i].addPoint(e.dxf.end)
+                    parts[i].addPoint(e.dxf.start)
+
+            elif e.dxftype() == 'SPLINE':
+                if not element.inverted:
+                    for point in e.control_points:
+                        parts[i].addPoint(point)
+                else:
+                    for point in reversed(e.control_points):
+                        parts[i].addPoint(point)
+                        
+            elif e.dxftype() == 'ARC':
+                if not element.inverted:
+                    for point in e.flattening(1):
+                        parts[i].addPoint(point)
+                else:
+                    for point in reversed(e.flattening(1)):
+                        parts[i].addPoint(point)
+
+            if (elementId != len(loop) -1):    
+                parts[i].vertices.pop()
+                        
+        
+        parts[i].vertices.pop()
+        parts[i].transformToContour() # Rearrange points so that they are all positive
+
+        area = parts[i].findArea()
+
+        if greatestArea < area:
+            greatestArea = area
+            greatestIndex = i
     
-    # if invertedCatch:
-    #     print("### An element DXF is inverted this could cause errors check to ensure correctly working")
-
-    return Part()
+    return parts[greatestIndex]
