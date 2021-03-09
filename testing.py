@@ -19,7 +19,7 @@ import time
 material = GenerateMaterial('Placement/Real-01.jpg')
 
 # Import DXF into part
-part = partFromDxf("TestFiles/TestDXFCutoutRound.dxf")
+part = partFromDxf("TestFiles/Large.dxf")
 
 
 startTime = time.time()

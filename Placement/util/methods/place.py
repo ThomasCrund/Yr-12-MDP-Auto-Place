@@ -64,15 +64,18 @@ def placePerimeter(mat: Material, part: Part):
             # print(startPoint, endPoint, section.adjMinPt, PartSectionLength, PartSectionAngle * 180 / math.pi, sectionAngle * 180 / math.pi)
 
             testAreaLength = getLength(startPoint, endPoint)
-            testPoints = [x / 100 for x in range(0, int(testAreaLength*100), int((testAreaLength*100) / ((testAreaLength)/ 4)))]
-            testPoints.append(testAreaLength)
-            for pointLength in testPoints:
+            # testPoints = [x / 100 for x in range(0, int(testAreaLength*100), int((testAreaLength*100) / ((testAreaLength)/ 4)))]
+            # testPoints.append(testAreaLength)
+            testingDistance = 0
+            while testingDistance < testAreaLength:
+            # for pointLength in testPoints:
                 # pointActualLength = pointLength + startLength
-                testPoint = ( int( startPoint[0] + pointLength * math.cos(sectionAngle)), int( startPoint[1] + pointLength * math.sin(sectionAngle)) )
-                # print(pointLength, startLength, testAreaLength, testPoint, section.placeSide)
+                testPoint = ( int( startPoint[0] + testingDistance * math.cos(sectionAngle)), int( startPoint[1] + testingDistance * math.sin(sectionAngle)) )
+                # print(testingDistance, startLength, testAreaLength, testPoint, section.placeSide)
 
                 PartMoved = PartRotated.copyMove(testPoint[0] - PointARot[0], testPoint[1] - PointARot[1], mat.width, mat.height)
                 if PartMoved == None:
+                    testingDistance += 4
                     continue
                 # img = generateImg(mat.height, mat.width)
 
@@ -87,6 +90,7 @@ def placePerimeter(mat: Material, part: Part):
                     sectionDistances[i] = 99999999.9
 
                 safePlace = True
+                minDistance = 9999999
                 for partSideCheckId in range(vertexLength):
                     nextSideCheckId = partSideCheckId + 1
                     if nextSideCheckId == vertexLength: nextSideCheckId = 0
@@ -121,6 +125,7 @@ def placePerimeter(mat: Material, part: Part):
                                     sectionDistances[cutoutId] = distance
                                 # cv.circle(img, pointCheckNew, abs(int(distance)), (255, 0, 0), 1)
                                 if distance < 18:
+                                    if distance < minDistance: minDistance = distance
                                     safePlace = False
                                     break
                                     # cv.circle(img, pointCheckNew, abs(int(distance)), (0, 0, 255), 1)
@@ -130,6 +135,7 @@ def placePerimeter(mat: Material, part: Part):
                                     checking = False
 
                         else:
+                            if distance < minDistance: minDistance = distance
                             safePlace = False
                             break
                             # cv.circle(img, pointCheck, abs(int(distance)), (0, 0, 255), 1)
@@ -138,7 +144,17 @@ def placePerimeter(mat: Material, part: Part):
                         if safePlace == False: break
                     if safePlace == False: break
                 
-                if safePlace == False: continue
+                # print(safePlace, minDistance, testingDistance)
+                if safePlace == False: 
+                    if minDistance - 18 > -4:
+                        testingDistance += 4
+                    else:
+                        testingDistance += -(minDistance - 18)
+
+                    continue
+                else:
+                    testingDistance += 4
+                    
 
                 # print(PointA, (sectionAngle - PartSectionAngle + math.pi), PointARot, testPoint, sectionDistances)
                 # if average([sectionDistances[i] for i in range(len(mat.cutouts))]) < 22:
