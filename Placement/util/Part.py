@@ -83,7 +83,6 @@ class Part:
         self.minY = round(self.minY + yMove)
         self.maxY = round(self.maxY + yMove)
 
-
     def print(self, border = 5):
         img = np.ones((self.maxY, self.maxX, 3), np.uint8)*255
         
@@ -100,6 +99,17 @@ class Part:
         for vertex in self.vertices:
             newPart.addPoint(rotateAroundPoint(vertex, angle, point))
         newPart.positiveContour()
+        return newPart
+
+    
+    def copyMove(self, x, y, xMax, yMax):
+        newPart = Part(self.unit)
+        for vertex in self.vertices:
+            newX = vertex[0] + x
+            newY = vertex[1] + y
+            if (newX < 0 or newY < 0 or newX > xMax or newY > yMax):
+                return None
+            newPart.addPoint((newX, newY))
         return newPart
         
 

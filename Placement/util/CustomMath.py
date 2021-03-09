@@ -12,3 +12,6 @@ def rotateAroundPoint(PointA, angle, PointB = (0, 0)):
     xNew = round(PointToRotate[0] * math.cos(angle) - PointToRotate[1] * math.sin(angle))
     yNew = round(PointToRotate[1] * math.cos(angle) + PointToRotate[0] * math.sin(angle))
     return (xNew + PointB[0], yNew + PointB[1])
+
+def average(list):
+    return sum(list) / len(list)

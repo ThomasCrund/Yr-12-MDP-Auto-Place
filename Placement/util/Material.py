@@ -3,7 +3,7 @@ from Placement.util.Section import Section, createSection
 from Placement.util.CustomMath import getAngle, getLength
 import cv2 as cv
 import numpy as np
-import random as rng
+import random as rnd
 import math
 
 class Material:
@@ -18,7 +18,7 @@ class Material:
     def print(self):
         img = np.ones((self.height, self.width, 3), np.uint8)*255
         for cutout in self.cutouts:
-            color = (rng.randint(0,256), rng.randint(0,256), rng.randint(0,256))
+            color = (rnd.randint(0,256), rnd.randint(0,256), rnd.randint(0,256))
             cv.drawContours(img, [cutout.getPoints()], -1, color, 2, cv.LINE_8)
         sections = self.findSections(16, 5)
         for Section in sections:
@@ -30,6 +30,18 @@ class Material:
         cv.imshow('Material Print', img)
         cv.waitKey(0)
         cv.destroyAllWindows()
+
+    def displayOnImage(self, img):
+        for cutout in self.cutouts:
+            color = (rnd.randint(0,256), rnd.randint(0,256), rnd.randint(0,256))
+            cv.drawContours(img, [cutout.getPoints()], -1, color, 2, cv.LINE_8)
+        sections = self.findSections(16, 5)
+        for Section in sections:
+            adjMin, adjMax, spaceMin, spaceMax = Section.getPoints()
+            cv.line(img, spaceMin, spaceMax, (0, 255, 0))
+            cv.line(img, adjMin, adjMax, (0, 0, 255))
+        return img
+
 
     def getCutouts(self):
         return self.cutouts
