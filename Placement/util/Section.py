@@ -14,12 +14,13 @@ class Section:
     SpaceMaxPt = (0, 0)
     SpaceMinPt = (0, 0)
 
-    def __init__(self, offsetX, offsetY, angle, originalSide, placeSide = 1):
+    def __init__(self, offsetX, offsetY, angle, originalSide, partOffId, placeSide = 1):
         self.offsetX = offsetX
         self.offsetY = offsetY
         self.angle = angle
         self.originalSide = originalSide
         self.placeSide = placeSide
+        self.partOffId = partOffId
         pass
 
     def setAdjacent(self, direction, num):
@@ -51,7 +52,7 @@ class Section:
 
 
 
-def createSection(section, pointA, pointB, offsetDistance, cutouts, currentCutoutIndex, screen):
+def createSection(section, pointA, pointB, offsetDistance, cutouts, currentCutoutIndex, screen, partOffId):
     secondAccuracy = 1
     aX, aY = pointA
     length = getLength(pointA, pointB)
@@ -72,7 +73,7 @@ def createSection(section, pointA, pointB, offsetDistance, cutouts, currentCutou
         placeSide = -1
     
 
-    sectionData = Section(offsetStartX, offsetStartY, angle, (pointA, pointB), placeSide)
+    sectionData = Section(offsetStartX, offsetStartY, angle, (pointA, pointB), partOffId, placeSide)
 
     direction = 1
     while direction >= 0:

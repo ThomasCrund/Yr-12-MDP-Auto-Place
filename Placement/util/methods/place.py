@@ -12,11 +12,17 @@ def placePerimeter(mat: Material, part: Part):
     bestScore = 0
     bestPartPlacement = None
 
-    sections = mat.findSections(20)
+    img = generateImg(mat.height, mat.width)
+
+    img = mat.displayOnImage(img)
+
+    checkDistance = 17
+    sections = mat.findSections(21)
     for section in sections:
         # print(section.getPoints(), section.placeSide)
         sectionAngle = section.angle
 
+        
         maxLength = getLength(section.SpaceMinPt, section.SpaceMaxPt)
         # print(maxLength)
 
@@ -29,6 +35,8 @@ def placePerimeter(mat: Material, part: Part):
             
             PartSectionAngle = getAngle(PointA, PointB)
             PartSectionLength = getLength(PointA, PointB)
+
+            # print(partSideId, PartSectionLength, PartSectionAngle)
 
 
             # print(mat.height, mat.width)
@@ -48,7 +56,7 @@ def placePerimeter(mat: Material, part: Part):
 
             # print("#####", section.adjMin, section.adjMax, section.SpaceMin, section.SpaceMax )
 
-            endPoint = section.adjMaxPt
+            endPoint = section.SpaceMaxPt
             startPoint = section.adjMinPt
             # print(section.SpaceMin)
             startLength = 0
@@ -66,6 +74,13 @@ def placePerimeter(mat: Material, part: Part):
             testAreaLength = getLength(startPoint, endPoint)
             # testPoints = [x / 100 for x in range(0, int(testAreaLength*100), int((testAreaLength*100) / ((testAreaLength)/ 4)))]
             # testPoints.append(testAreaLength)
+            # testingDistance = min(-PartSectionLength, )
+
+            # if (section.partOffId == 9 and ( partSideId == 5 or partSideId == 11 ) ):
+            #     cv.line(img, startPoint, endPoint, (0, 255, 0))
+                # cv.line(img, section.SpaceMinPt, section.spaceMaxPt, (0, 255, 0))
+                # cv.line(img, section.adjMinPt, section.adjMaxPt, (0, 0, 255))
+            
             testingDistance = 0
             while testingDistance < testAreaLength:
             # for pointLength in testPoints:
@@ -107,53 +122,63 @@ def placePerimeter(mat: Material, part: Part):
                         if sectionDistances[cutoutId] > distance:
                             sectionDistances[cutoutId] = distance
 
-                        if distance > 18 + CheckLength:
+                        if distance > checkDistance + CheckLength:
                             pass
                             # cv.circle(img, pointCheck, abs(int(distance)), (0, 255, 0), 1)
-                        elif distance > 18:
-                            # print(partSideCheckId, pointCheck, distance, CheckLength, CheckLength + 18)
+                        elif distance > checkDistance:
+                            # print(partSideCheckId, pointCheck, distance, CheckLength, CheckLength + checkDistance)
                             # cv.circle(img, pointCheck, abs(int(distance)), (255, 0, 0), 1)
                             checking = True
                             remainingLength = CheckLength
                             pointCheckNew = PointCheckA
+                            distance -= checkDistance
                             while checking:
-                                pointCheckNew = ( int( pointCheckNew[0] + distance * math.cos(CheckAngle)), int( pointCheckNew[1] + distance * math.sin(CheckAngle)) )
-                                # print(partSideCheckId, pointCheck, distance, CheckLength, CheckLength + 18)
+                                predistance = distance
+                                pointCheckNew = ( int( pointCheckNew[0] + distance  * math.cos(CheckAngle)), int( pointCheckNew[1] + distance * math.sin(CheckAngle)) )
+                                # print(partSideCheckId, pointCheck, distance, CheckLength, CheckLength + checkDistance)
                                 distance = -cv.pointPolygonTest(cutout.points, pointCheckNew, True)
 
                                 if sectionDistances[cutoutId] > distance:
                                     sectionDistances[cutoutId] = distance
                                 # cv.circle(img, pointCheckNew, abs(int(distance)), (255, 0, 0), 1)
-                                if distance < 18:
+                                if distance < checkDistance:
                                     if distance < minDistance: minDistance = distance
                                     safePlace = False
+                                    if ( section.partOffId == checkDistance and ( partSideId == 5 or partSideId == 11 ) and (section.adjMax - section.adjMin) == 153 and int(distance) == 17  ): # and distance == 13.408956583091223
+                                        print("###", distance, cutoutId, partSideCheckId, pointCheckNew, predistance, section.adjMax - section.adjMin)
+                                        cv.circle(img, pointCheckNew, 1, (255, 0, 0), 1)
+                                        cv.circle(img, pointCheckNew, abs(int(distance)), (0, 0, 255), 1)
+                                    #     cv.drawContours(img, [PartMoved.getContour()], -1, (0, 0, int( 255 * (partSideId / vertexLength) ) ), 2, cv.LINE_8)
+                                        # cv.line(img, PointCheckA, PointCheckB, (0, 255, 0), )
                                     break
-                                    # cv.circle(img, pointCheckNew, abs(int(distance)), (0, 0, 255), 1)
 
                                 remainingLength -= distance
-                                if distance > remainingLength + 18:
+                                if distance > remainingLength + checkDistance:
                                     checking = False
 
                         else:
                             if distance < minDistance: minDistance = distance
                             safePlace = False
+                            # cv.drawContours(img, [PartMoved.getContour()], -1, (0, 0, int( 255 * (partSideId / vertexLength) ) ), 2, cv.LINE_8)
+
                             break
                             # cv.circle(img, pointCheck, abs(int(distance)), (0, 0, 255), 1)
-                            print("Can't Fit", partSideCheckId, pointCheck, distance, CheckLength, CheckLength + 18)
+                            print("Can't Fit", partSideCheckId, pointCheck, distance, CheckLength, CheckLength + checkDistance)
 
                         if safePlace == False: break
                     if safePlace == False: break
                 
                 # print(safePlace, minDistance, testingDistance)
                 if safePlace == False: 
-                    if minDistance - 18 > -4:
+                    
+                    if minDistance - checkDistance > -4:
                         testingDistance += 4
                     else:
-                        testingDistance += -(minDistance - 18)
+                        testingDistance += -(minDistance - checkDistance)
 
                     continue
-                else:
-                    testingDistance += 4
+            
+                
                     
 
                 # print(PointA, (sectionAngle - PartSectionAngle + math.pi), PointARot, testPoint, sectionDistances)
@@ -163,20 +188,40 @@ def placePerimeter(mat: Material, part: Part):
                 # score = 1
                 score = calculatePerimeter(mat, PartMoved, sectionDistances)
                 # print(score)
+                # if not ( partSideId == 5 or partSideId == 11 ):
+                cv.drawContours(img, [PartMoved.getContour()], -1, (0, 0, int( 255 * (partSideId / vertexLength) ) ), 2, cv.LINE_8)
 
+                    
                 if score > bestScore:
+                    # print(sectionDistances)
+                    calculatePerimeter(mat, PartMoved, sectionDistances, True)
                     bestScore = score
                     bestPartPlacement = PartMoved
 
+                if score < bestScore * 0.5:
+                    nearestDistance = mat.width
+                    for i in range(len(mat.cutouts)):
+                        if not i == section.partOffId:
+                            nearestDistance = min(nearestDistance, sectionDistances[i])
+                    testingDistance += max(4, nearestDistance - checkDistance)
+
+                else:
+                    nearestDistance = mat.width
+                    for i in range(len(mat.cutouts)):
+                        nearestDistance = min(nearestDistance, sectionDistances[i])
+                    testingDistance += max(4, nearestDistance - checkDistance)
+            
 
 
-    img = generateImg(mat.height, mat.width)
 
-    img = mat.displayOnImage(img)
 
-    cv.drawContours(img, [bestPartPlacement.getContour()], -1, (0, 255, 0), 2, cv.LINE_8)
+
+
+
+    cv.drawContours(img, [bestPartPlacement.getContour()], -1, (255, 0, 0), 5, cv.LINE_8)
 
     cv.imwrite("OutputImage.jpg", img)
+    print(bestScore)
 
     # displayImage(img)
 

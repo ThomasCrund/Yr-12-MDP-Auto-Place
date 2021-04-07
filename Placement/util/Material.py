@@ -34,7 +34,7 @@ class Material:
     def displayOnImage(self, img):
         for cutout in self.cutouts:
             color = (rnd.randint(0,256), rnd.randint(0,256), rnd.randint(0,256))
-            cv.drawContours(img, [cutout.getPoints()], -1, color, 2, cv.LINE_8)
+            cv.drawContours(img, [cutout.getPoints()], -1, color, 1, cv.LINE_8)
         sections = self.findSections(16, 5)
         for Section in sections:
             adjMin, adjMax, spaceMin, spaceMax = Section.getPoints()
@@ -104,7 +104,7 @@ class Material:
             for currentSectionId in range(len(openSections)):
                 section = openSections[currentSectionId]
             
-                sectionData = createSection(section, pointA, pointB, offsetDistance, self.cutouts, currentCutoutIndex, (self.width, self.height))
+                sectionData = createSection(section, pointA, pointB, offsetDistance, self.cutouts, currentCutoutIndex, (self.width, self.height), currentCutoutIndex)
                 if sectionData != None:
                     materialSections.append(sectionData)
                 
