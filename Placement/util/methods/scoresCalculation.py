@@ -15,7 +15,7 @@ def calculatePerimeter(mat: Material, placedPart: Part, nearby, debug = False):
     noneNearby = False
     # withoutCode = ""
     for i in range(len(mat.cutouts)):
-        if nearby[i] < 30:
+        if nearby[i] < 23:
             if debug: print(i, nearby[i])
             # withoutCode += str(i)
             noneNearby = True
@@ -44,12 +44,12 @@ def calculatePerimeter(mat: Material, placedPart: Part, nearby, debug = False):
     totalPerimeterScore = 100
     if permimeterWith != permimeterWithout: 
 
-        totalPerimeterScore = cv.arcLength(placedPart.getContour(), True) / ( permimeterWith - permimeterWithout )
+        totalPerimeterScore = min(cv.arcLength(placedPart.getContour(), True) / ( permimeterWith - permimeterWithout ), 100)
 
     adjustmentScore = 1 / averagePerimeters(individualPerimeters)
 
     if debug: 
-        print(permimeterWithout, permimeterWith, cv.arcLength(placedPart.getContour(), True), totalPerimeterScore, adjustmentScore)
+        print("###", permimeterWithout, permimeterWith, cv.arcLength(placedPart.getContour(), True), totalPerimeterScore, adjustmentScore)
         img = generateImg(mat.height, mat.width)
 
 
