@@ -1,20 +1,26 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
+// import { useOpenCv } from 'opencv-react'
+import ImageUpload from './ImageUpload'
+import MaskCreator from './MaskCreator'
 
-export class MaterialImporter extends Component {
-    componentDidMount() {
-        // import('../opencv/opencv').then(opencv => {
-        //     console.log(opencv)
-        // })
+export default function MaterialImporter() {
+    // const { cv } = useOpenCv()
+    // const [ colours, setColours] = useState([]);
+    const [ img, setImg ] = useState()
+
+    let uploadHandler = (fileMat) => {
+        setImg(fileMat)
+        console.log(img)
     }
 
-
-    render() {
-        return (
-            <div>
-                <h3>Material Detecter</h3>
-            </div>
-        )
-    }
+    return (
+        <div>
+            <ImageUpload onUpload={uploadHandler} />
+            {img !== undefined 
+            ? <MaskCreator img={img}/>
+            : null}
+            
+            <div></div>
+        </div>
+    )
 }
-
-export default MaterialImporter
