@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useOpenCv } from 'opencv-react'
 
 
@@ -6,15 +6,18 @@ export default function MaskCreator(props) {
     const [ colours, setColours] = useState([]);
     const [ blur, setBlur] = useState(0);
     const { cv } = useOpenCv();
+    // const maskGlobal = useRef(null);
+    
+    // const applyButtonCall = () => { 
+    //     // console.log("buttonPressed", maskGlobal.current)
+    //     props.onMaskChange(maskGlobal.current) 
+    // }
 
     useEffect(() => {
         if (cv) {
             let Img = new cv.Mat()
             let ksize = new cv.Size(blur, blur);
             if (blur !== 0) {
-                // cv.blur(props.img, Img, ksize)
-                // cv.GaussianBlur(props.img, Img, ksize, 0, 0, cv.BORDER_DEFAULT)
-                // cv.GaussianBlur(props.img, Img, ksize, 0, 0, cv.BORDER_DEFAULT);
                 cv.medianBlur(props.img, Img, 1 + Math.round(blur / 2) * 2 );
             } else {
                 Img = props.img;
@@ -34,8 +37,13 @@ export default function MaskCreator(props) {
                 dst.delete()
             }
             cv.imshow('canvasMask', mask);
+            // maskGlobal.current = mask;
+            if (colours.length !== 0) {
+                props.onMaskChange(mask);
+            }
             // Img.delete();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [cv, props.img, colours, blur])
 
     let canvasClick = (e) => {
@@ -60,7 +68,6 @@ export default function MaskCreator(props) {
 
     }
     
-    
 
 
 
@@ -73,6 +80,7 @@ export default function MaskCreator(props) {
             <canvas id="canvasBlurred" onClick={canvasClick} ></canvas>
             <div>{JSON.stringify(colours, 2)}</div>
             <canvas id="canvasMask" onClick={canvasClick} ></canvas>
+            {/* <button type="button" onClick={applyButtonCall} >Click Me!</button> */}
         </div>
     )
 }
