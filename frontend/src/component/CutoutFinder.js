@@ -125,6 +125,8 @@ export default function CutoutFinder(props) {
 
 
         axios.post('/api/material/test', {
+            "height": props.mask.rows, 
+            "width": props.mask.cols,
             "cutouts": cutouts
         }).then((response) => {
             console.log(response)
