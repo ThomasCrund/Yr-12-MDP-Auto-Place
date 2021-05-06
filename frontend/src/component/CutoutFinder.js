@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useOpenCv } from 'opencv-react'
+import axios from 'axios'
 
 export default function CutoutFinder(props) {
     const [ minArea, setMinArea ] = useState(0);
@@ -39,6 +40,7 @@ export default function CutoutFinder(props) {
             //Only output if area is greater than threshold
             let area = cv.contourArea(cleanedCnt, false);
             if (area > minArea) {
+                // console.log(cleanedCnt.data)
                 cv.drawContours(dstApprox, poly, i, color, 1);
             }
 
@@ -55,6 +57,10 @@ export default function CutoutFinder(props) {
 
     let saveClick = () => {
 
+        //TestOutput stuff
+        let testOutput = cv.Mat.ones(props.mask.rows, props.mask.cols, cv.CV_8UC3);
+
+
         //// I recalculate everything due to issues i was having saving contours in state.
 
         //Setup mats for contours and hierarchy(not used)
@@ -63,8 +69,11 @@ export default function CutoutFinder(props) {
 
         cv.findContours(props.mask, contours, hierarchy, cv.RETR_CCOMP, cv.CHAIN_APPROX_SIMPLE);
 
+
+        const cutouts = {}
         //Approximate the contour to clean up the edges.
         for (let i = 0; i < contours.size(); ++i) {
+        // for (let i = 0; i < 1; ++i) {
             
             let cnt = contours.get(i);
             let cleanedCnt = new cv.Mat();
@@ -76,15 +85,52 @@ export default function CutoutFinder(props) {
             let area = cv.contourArea(cleanedCnt, false);
             if (area > minArea) {
 
-                console.log(area, cleanedCnt.data, cleanedCnt.data.length)
+                // console.log(area, cleanedCnt.data, cleanedCnt.data.length)
+
+                cutouts[i] = []
+                for (let j = 0; j < cleanedCnt.data32S.length; j += 2){
+                    let p = {}
+                    p.x = cleanedCnt.data32S[j]
+                    p.y = cleanedCnt.data32S[j+1]
+                    cutouts[i].push(p)
+                }
+                // console.log(cutouts[i])
+                
+                //Output for testing
+                for (let pointId = 0; pointId < cutouts[i].length; pointId++) {
+                    let nextPointId = pointId+1
+                    if (nextPointId === cutouts[i].length) {
+                        nextPointId = 0
+                    }
+                    const x1 = cutouts[i][pointId].x;
+                    const y1 = cutouts[i][pointId].y;
+                    const x2 = cutouts[i][nextPointId].x;
+                    const y2 = cutouts[i][nextPointId].y;
+                    cv.line(testOutput, new cv.Point(x1, y1), new cv.Point(x2, y2), [0, 0, 255, 255], 1)
+                    
+                    
+                }
             }
+
+            console.log(cutouts)
+
             
 
             cleanedCnt.delete();
             cnt.delete(); 
         }
 
-        contours.delete(); hierarchy.delete();
+        cv.imshow('TestOutput', testOutput);
+        contours.delete(); hierarchy.delete(); testOutput.delete();
+
+
+        axios.post('/api/material/test', {
+            "cutouts": cutouts
+        }).then((response) => {
+            console.log(response)
+        }).catch(err => {
+            console.log("err", err)
+        })
     }
 
 
@@ -95,7 +141,9 @@ export default function CutoutFinder(props) {
             </div>
             <canvas id="canvasContours" ></canvas>
             <canvas id="canvasApprox" ></canvas>
+            <br/>
             <button onClick={saveClick}>Save Contours</button>
+            <canvas id="TestOutput" ></canvas>
         </div>
     )
 }
