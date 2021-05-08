@@ -21,8 +21,8 @@ def GenerateMaterialJSON(json):
 
 
         contourCVStructure = np.array(list(map(mappingFunction, contour)))
-        # x,y,w,h = cv.boundingRect(contour)
-        # if x == 0 and y == 0 and w == width and h == height: continue # Get Rid of the contour around the border of the image
+        x,y,w,h = cv.boundingRect(contourCVStructure)
+        if x == 0 and y == 0 and w == width and h == height: continue # Get Rid of the contour around the border of the image
         cutout = Cutout(contourCVStructure)
         # cutout.simplify()
         # if findDuplicateCutout(cutouts, cutout.points): continue # If duplicate contour exists already do not add this contour
