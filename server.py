@@ -6,12 +6,15 @@ from filestorage import store
 from filestorage.handlers import AsyncLocalFileHandler
 import uvicorn
 
-
 from Placement.util.methods.MatFromJSON import GenerateMaterialJSON
+from Placement.util.methods.dxfImport import partFromDxf
+from Placement.util.methods.place import placePerimeter
+
 import cv2 as cv
 import numpy as np
 import json
 import ezdxf
+import time
 
 async def materialPost(request):
     body = await request.json()
@@ -39,8 +42,17 @@ async def runPlace(request):
     filename = form["upload_file"].filename
     contents = await form["upload_file"].read()
     with open(f'data/{filename}', 'wb') as f:
-     f.write(contents)
-    return JSONResponse({"success":False})
+        f.write(contents)
+    f = open(f"data/{request.path_params['matId']}.json", "r")
+    matJSON = json.loads(f.read())
+    material = GenerateMaterialJSON(matJSON)
+    part = partFromDxf(f'data/{filename}')
+
+    startTime = time.time()
+
+    placePerimeter(material, part);
+
+    return JSONResponse({"success":True, "time": time.time() - startTime})
 
 # async def some_startup_task():
 #     print(store.handler)
