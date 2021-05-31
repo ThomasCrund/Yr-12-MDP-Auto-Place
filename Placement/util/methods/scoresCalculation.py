@@ -6,6 +6,8 @@ from Placement.util.methods.ImageOutput import generateImg, displayImage
 import numpy as np
 import cv2 as cv
 
+counter = 0
+
 # withoutScores = {}
 
 def calculatePerimeter(mat: Material, placedPart: Part, nearby, debug = False):
@@ -13,6 +15,9 @@ def calculatePerimeter(mat: Material, placedPart: Part, nearby, debug = False):
     adjArray = np.array([[[0, 0]]])
     individualPerimeters = []
     noneNearby = False
+    img = None
+    if debug:
+        img = generateImg(mat.height, mat.width)
     # withoutCode = ""
     for i in range(len(mat.cutouts)):
         if nearby[i] < 23:
@@ -22,6 +27,10 @@ def calculatePerimeter(mat: Material, placedPart: Part, nearby, debug = False):
             adjArray = np.concatenate((adjArray, mat.cutouts[i].points))
             individualArray = np.concatenate((mat.cutouts[i].points, placedPart.getContour()))
             individualPerimeters.append(( cv.arcLength( cv.convexHull( mat.cutouts[i].points ), True ) , cv.arcLength( cv.convexHull( individualArray ), True ) ))
+            if debug:
+                cv.drawContours(img, [cv.convexHull( individualArray )], -1, (0, 0, 255), 2, cv.LINE_8)
+                cv.drawContours(img, [cv.convexHull( mat.cutouts[i].points )], -1, (0, 255, 0), 2, cv.LINE_8)
+                pass
     adjArray = np.delete(adjArray, 0, 0)
 
     if not noneNearby:
@@ -50,15 +59,16 @@ def calculatePerimeter(mat: Material, placedPart: Part, nearby, debug = False):
 
     if debug: 
         print("###", permimeterWithout, permimeterWith, cv.arcLength(placedPart.getContour(), True), totalPerimeterScore, adjustmentScore)
-        img = generateImg(mat.height, mat.width)
+        # img = generateImg(mat.height, mat.width)
 
 
-        cv.drawContours(img, [hullWithout], -1, (0, 255, 0), 2, cv.LINE_8)
-        cv.drawContours(img, [hullWith], -1, (0, 0, 255), 2, cv.LINE_8)
+        # cv.drawContours(img, [hullWithout], -1, (0, 255, 0), 2, cv.LINE_8)
+        # cv.drawContours(img, [hullWith], -1, (0, 0, 255), 2, cv.LINE_8)
         cv.drawContours(img, [placedPart.getContour()], -1, (255, 0, 0), 2, cv.LINE_8)
 
-
-        cv.imwrite("OutputImageDebug.jpg", img)
+        global counter
+        cv.imwrite("OutputImageDebug" + str(counter)  + "all.jpg", img)
+        counter += 1
         print(individualPerimeters)
 
 

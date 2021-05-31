@@ -4,13 +4,14 @@ import axios from 'axios'
 
 export default function CutoutFinder(props) {
     const [ minArea, setMinArea ] = useState(0);
+    const [ matName, setMatName ] = useState("");
     const { cv } = useOpenCv();
 
-    console.log("CutoutFinder", props)
+    // console.log("CutoutFinder", props)
 
     useEffect(() => {
 
-        let dst = cv.Mat.zeros(props.mask.rows, props.mask.cols, cv.CV_8UC3);
+        // let dst = cv.Mat.zeros(props.mask.rows, props.mask.cols, cv.CV_8UC3);
         let dstApprox = cv.Mat.zeros(props.mask.rows, props.mask.cols, cv.CV_8UC3);
 
         let contours = new cv.MatVector();
@@ -28,7 +29,7 @@ export default function CutoutFinder(props) {
             let color = new cv.Scalar(Math.round(Math.random() * 255), Math.round(Math.random() * 255),
                                     Math.round(Math.random() * 255));
 
-            cv.drawContours(dst, contours, i, color, 1, cv.LINE_8, hierarchy, 100);
+            // cv.drawContours(dst, contours, i, color, 1, cv.LINE_8, hierarchy, 100);
 
             let cleanedCnt = new cv.Mat();
             let cnt = contours.get(i);
@@ -48,10 +49,9 @@ export default function CutoutFinder(props) {
         }
 
         //Update Output Frames
-        cv.imshow('canvasContours', dst);
         cv.imshow('canvasApprox', dstApprox);
 
-        dst.delete(); contours.delete(); hierarchy.delete();
+        contours.delete(); hierarchy.delete();
 
     }, [cv, props.mask, minArea])
 
@@ -97,22 +97,20 @@ export default function CutoutFinder(props) {
                 // console.log(cutouts[i])
                 
                 //Output for testing
-                for (let pointId = 0; pointId < cutouts[i].length; pointId++) {
-                    let nextPointId = pointId+1
-                    if (nextPointId === cutouts[i].length) {
-                        nextPointId = 0
-                    }
-                    const x1 = cutouts[i][pointId].x;
-                    const y1 = cutouts[i][pointId].y;
-                    const x2 = cutouts[i][nextPointId].x;
-                    const y2 = cutouts[i][nextPointId].y;
-                    cv.line(testOutput, new cv.Point(x1, y1), new cv.Point(x2, y2), [0, 0, 255, 255], 1)
-                    
-                    
-                }
+                // for (let pointId = 0; pointId < cutouts[i].length; pointId++) {
+                //     let nextPointId = pointId+1
+                //     if (nextPointId === cutouts[i].length) {
+                //         nextPointId = 0
+                //     }
+                //     const x1 = cutouts[i][pointId].x;
+                //     const y1 = cutouts[i][pointId].y;
+                //     const x2 = cutouts[i][nextPointId].x;
+                //     const y2 = cutouts[i][nextPointId].y;
+                //     cv.line(testOutput, new cv.Point(x1, y1), new cv.Point(x2, y2), [0, 0, 255, 255], 1)
+                // }
             }
 
-            console.log(cutouts)
+            // console.log(cutouts)
 
             
 
@@ -120,11 +118,10 @@ export default function CutoutFinder(props) {
             cnt.delete(); 
         }
 
-        cv.imshow('TestOutput', testOutput);
         contours.delete(); hierarchy.delete(); testOutput.delete();
 
 
-        axios.post('/api/material/test', {
+        axios.post(`/api/material/${matName}`, {
             "height": props.mask.rows, 
             "width": props.mask.cols,
             "cutouts": cutouts
@@ -141,11 +138,10 @@ export default function CutoutFinder(props) {
             <div>
                 Min Contour Area: <input type="range" min={0} max={200} value={minArea} onChange={e => setMinArea(parseInt(e.target.value))} /> {minArea}
             </div>
-            <canvas id="canvasContours" ></canvas>
             <canvas id="canvasApprox" ></canvas>
             <br/>
+            <span>Material Name: </span><input type="text" value={matName} onChange={e => setMatName(e.target.value)} />
             <button onClick={saveClick}>Save Contours</button>
-            <canvas id="TestOutput" ></canvas>
         </div>
     )
 }

@@ -15,22 +15,26 @@ import time
 # partFromDxf("TestFiles/TestDXFCutout.dxf")
 
 # Generate Material
-# material = GenerateMaterial('Placement/TestDouble.jpg')
-material = GenerateMaterial('Placement/Real-01.jpg')
+material = GenerateMaterial('Placement/TestAngleHard.jpg')
+# material = GenerateMaterial('Placement/Real-01.jpg')
 
-# Import DXF into part
-part = partFromDxf("TestFiles/Large.dxf")
-
-
-startTime = time.time()
+material.print()
 
 # part.print()
 # part.rotate((0, 0), math.pi/4).print()
 
 # Calculate the best position for the part
-placePerimeter(material, part);
 
-print(time.time() - startTime)
+# # Import DXF into part
+# part = partFromDxf("TestFiles/Large.dxf")
+
+
+# startTime = time.time()
+
+
+# placePerimeter(material, part);
+
+# print(time.time() - startTime)
 
 
 

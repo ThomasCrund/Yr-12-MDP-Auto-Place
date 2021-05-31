@@ -1,8 +1,12 @@
 import './App.css';
 import MaterialImporter from './component/MaterialImporter'
 import { OpenCvProvider } from 'opencv-react'
+import PlacementController from './component/PlacementController';
+import { useState } from 'react'
+import NavBar from './component/NavBar';
 
 function App() {
+  const [ currentTab, setTab ] = useState(0)
 
   let onLoaded = (cv) => {
     console.log('opencv loaded, cv')
@@ -10,9 +14,13 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Auto Place</h1>
+      <NavBar tabClick={setTab} tab={currentTab} />
       <OpenCvProvider onLoad={onLoaded} >
-        <MaterialImporter />
+        <div className="bodyWrapper">
+          {currentTab === 0   ? <MaterialImporter />
+                              : <PlacementController />
+          }
+        </div>
       </OpenCvProvider>
       
     </div>
