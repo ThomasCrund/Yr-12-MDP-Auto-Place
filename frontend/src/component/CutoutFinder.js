@@ -5,6 +5,7 @@ import axios from 'axios'
 export default function CutoutFinder(props) {
     const [ minArea, setMinArea ] = useState(0);
     const [ matName, setMatName ] = useState("");
+    const [ requestResponse, setResponse ] = useState({res: false});
     const { cv } = useOpenCv();
 
     // console.log("CutoutFinder", props)
@@ -126,8 +127,10 @@ export default function CutoutFinder(props) {
             "width": props.mask.cols,
             "cutouts": cutouts
         }).then((response) => {
+            setResponse({res: true, success: true})
             console.log(response)
         }).catch(err => {
+            setResponse({res: true, success: false})
             console.log("err", err)
         })
     }
@@ -142,6 +145,7 @@ export default function CutoutFinder(props) {
             <br/>
             <span>Material Name: </span><input type="text" value={matName} onChange={e => setMatName(e.target.value)} />
             <button onClick={saveClick}>Save Contours</button>
+            {requestResponse.res ? ( requestResponse.success ? "Success" : "failed Try again" ) : null}
         </div>
     )
 }

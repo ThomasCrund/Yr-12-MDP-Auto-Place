@@ -68,7 +68,6 @@ export default function PlacementController() {
                 </div>}
             </div>
             : null}
-            Changed
         </div>
     )
 }
