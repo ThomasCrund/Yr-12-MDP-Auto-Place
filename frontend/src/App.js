@@ -7,8 +7,10 @@ import NavBar from './component/NavBar';
 
 function App() {
   const [ currentTab, setTab ] = useState(0)
+  const [ openCVLoaded, setCV ] = useState(false)
 
   let onLoaded = (cv) => {
+    setCV(true)
     console.log('opencv loaded, cv')
   }
 
@@ -17,9 +19,12 @@ function App() {
       <NavBar tabClick={setTab} tab={currentTab} />
       <OpenCvProvider onLoad={onLoaded} >
         <div className="bodyWrapper">
-          {currentTab === 0   ? <MaterialImporter />
-                              : <PlacementController />
+          {openCVLoaded ? 
+            currentTab === 0    ? <MaterialImporter />
+                                : <PlacementController />
+                         : "Waiting for OpenCV to Load"
           }
+          
         </div>
       </OpenCvProvider>
       
