@@ -31,15 +31,16 @@ class Material:
         cv.waitKey(0)
         cv.destroyAllWindows()
 
-    def displayOnImage(self, img):
+    def displayOnImage(self, img, sectionsShow = True):
         for cutout in self.cutouts:
             color = (rnd.randint(0,256), rnd.randint(0,256), rnd.randint(0,256))
             cv.drawContours(img, [cutout.getPoints()], -1, color, 1, cv.LINE_8)
-        sections = self.findSections(16, 5)
-        for Section in sections:
-            adjMin, adjMax, spaceMin, spaceMax = Section.getPoints()
-            cv.line(img, spaceMin, spaceMax, (0, 255, 0))
-            cv.line(img, adjMin, adjMax, (0, 0, 255))
+        if sectionsShow:
+            sections = self.findSections(16, 5)
+            for Section in sections:
+                adjMin, adjMax, spaceMin, spaceMax = Section.getPoints()
+                cv.line(img, spaceMin, spaceMax, (0, 255, 0))
+                cv.line(img, adjMin, adjMax, (0, 0, 255))
         return img
 
 

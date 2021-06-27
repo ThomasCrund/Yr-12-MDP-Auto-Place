@@ -24,6 +24,7 @@ def GenerateMaterialJSON(json):
         x,y,w,h = cv.boundingRect(contourCVStructure)
         if x == 0 and y == 0 and w == width and h == height: continue # Get Rid of the contour around the border of the image
         cutout = Cutout(contourCVStructure)
+        cutout.simplify()
         # cutout.simplify()
         # if findDuplicateCutout(cutouts, cutout.points): continue # If duplicate contour exists already do not add this contour
         cutouts.append(cutout)

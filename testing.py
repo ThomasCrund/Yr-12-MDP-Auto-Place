@@ -15,26 +15,27 @@ import time
 # partFromDxf("TestFiles/TestDXFCutout.dxf")
 
 # Generate Material
-material = GenerateMaterial('Placement/TestAngleHard.jpg')
-# material = GenerateMaterial('Placement/Real-01.jpg')
+# material = GenerateMaterial('Placement/TestAngleHard.jpg')
+material = GenerateMaterial('Placement/Real-01.jpg')
 
-material.print()
+print(material)
+# material.print()
 
 # part.print()
 # part.rotate((0, 0), math.pi/4).print()
 
 # Calculate the best position for the part
 
-# # Import DXF into part
-# part = partFromDxf("TestFiles/Large.dxf")
+# Import DXF into part
+part = partFromDxf("TestFiles/Large.dxf")
 
 
-# startTime = time.time()
+startTime = time.time()
 
 
-# placePerimeter(material, part);
+placePerimeter(material, part);
 
-# print(time.time() - startTime)
+print(time.time() - startTime)
 
 
 
@@ -42,7 +43,10 @@ material.print()
 # print(cv.contourArea(material.cutouts[0].points))
 # material.print()
 
-
+PointA = (124.23, 72.12)
+PointB = (150.23, 93.4)
+print(getAngle(PointA, PointB))
+print(getLength(PointA, PointB))
 
 
 # img = np.ones((material.height, material.width, 3), np.uint8)*255

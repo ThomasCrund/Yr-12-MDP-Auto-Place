@@ -10,7 +10,7 @@ function ImageUpload(props) {
         let src = cv.imread(e.target);
         console.log(src.cols, src.rows)
         let dst = new cv.Mat();
-        let dsize = new cv.Size(300, src.rows * 300 / src.cols);
+        let dsize = new cv.Size(600, src.rows * 600 / src.cols);
         cv.resize(src, dst, dsize, 0, 0, cv.INTER_AREA);
         src.delete();
         console.log(dst, dst.isContinuous())

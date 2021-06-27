@@ -11,10 +11,11 @@ def placePerimeter(mat: Material, part: Part):
     # part.print()
     bestScore = 0
     bestPartPlacement = None
+    bestInfo = (0, 0, 0)
 
     img = generateImg(mat.height, mat.width)
 
-    img = mat.displayOnImage(img)
+    img = mat.displayOnImage(img, False)
 
     checkDistance = 17
     sections = mat.findSections(21)
@@ -46,6 +47,7 @@ def placePerimeter(mat: Material, part: Part):
 
             # print(PartSectionAngle, sectionAngle, sectionAngle - PartSectionAngle + math.pi)
             # print(PartSectionAngle * 180/math.pi, sectionAngle * 180/math.pi, (sectionAngle - PartSectionAngle + math.pi) * 180/math.pi)
+            angleRotated = sectionAngle - PartSectionAngle + math.pi
             PartRotated = part.rotate(PointA, sectionAngle - PartSectionAngle + math.pi)
 
             PointARot = PartRotated.vertices[partSideId]
@@ -87,7 +89,8 @@ def placePerimeter(mat: Material, part: Part):
                 # pointActualLength = pointLength + startLength
                 testPoint = ( int( startPoint[0] + testingDistance * math.cos(sectionAngle)), int( startPoint[1] + testingDistance * math.sin(sectionAngle)) )
                 # print(testingDistance, startLength, testAreaLength, testPoint, section.placeSide)
-
+                xMove = testPoint[0] - PointARot[0]
+                yMove = testPoint[1] - PointARot[1]
                 PartMoved = PartRotated.copyMove(testPoint[0] - PointARot[0], testPoint[1] - PointARot[1], mat.width, mat.height)
                 if PartMoved == None:
                     testingDistance += 4
@@ -206,6 +209,7 @@ def placePerimeter(mat: Material, part: Part):
                     calculatePerimeter(mat, PartMoved, sectionDistances, True)
                     bestScore = score
                     bestPartPlacement = PartMoved
+                    bestInfo = (xMove, yMove, angleRotated)
 
                 if score < bestScore * 0.5:
                     nearestDistance = mat.width
@@ -226,17 +230,15 @@ def placePerimeter(mat: Material, part: Part):
 
 
 
+    if bestPartPlacement != None:
+        cv.drawContours(img, [bestPartPlacement.getContour()], -1, (255, 0, 0), 5, cv.LINE_8)
 
-    cv.drawContours(img, [bestPartPlacement.getContour()], -1, (255, 0, 0), 5, cv.LINE_8)
-
-    cv.imwrite("OutputImage.jpg", img)
-    print(bestScore)
+    cv.imwrite("frontend/build/placementOutput/OutputImage.jpg", img)
+    print(bestScore, bestInfo)
 
     # displayImage(img)
 
 
 
 
-
-
-    return (0, 0, 0)
+    return bestInfo

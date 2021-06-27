@@ -50,9 +50,13 @@ async def runPlace(request):
 
     startTime = time.time()
 
-    placePerimeter(material, part);
+    result = placePerimeter(material, part)
 
-    return JSONResponse({"success":True, "time": time.time() - startTime})
+    print("##!#", result)
+    if result[0] != 0 and result[0] != 0 and result[0] != 0:
+
+        return JSONResponse({"success":True, "time": time.time() - startTime, "result": {"x": result[0], "y": result[1], "rot": result[2] * 180 / 3.14159265359}})
+    return JSONResponse({"success": False, "message": "Part did not fit on material"})
 
 # async def some_startup_task():
 #     print(store.handler)
